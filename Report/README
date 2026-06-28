@@ -1,0 +1,17 @@
+## RBAC Configuration
+
+A simulated multi-team environment was designed as follows:
+
+| Team            | Resource Group        | Role        |
+| --------------- | --------------------- | ----------- |
+| TeamA           | rg-webapp-prod-eastus | Contributor |
+| TeamB           | rg-webapp-dev-eastus  | Contributor |
+| Operations Team | All Resource Groups   | Reader      |
+
+### Rationale
+
+* TeamA requires full management rights for production resources.
+* TeamB requires full management rights for development resources.
+* Operations Team requires read-only access for monitoring and auditing purposes.
+
+Due to the use of a single Azure Free Trial account, the RBAC structure was documented rather than implemented with multiple Azure users.
