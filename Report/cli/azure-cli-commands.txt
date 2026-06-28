@@ -1,0 +1,19 @@
+# Create Development Resource Group
+az group create --name rg-webapp-dev-eastus --location eastus
+
+# Create Production Resource Group
+az group create --name rg-webapp-prod-eastus --location eastus
+
+# Create Development Storage Account
+az storage account create \
+  --name stwebappdeveastus \
+  --resource-group rg-webapp-dev-eastus \
+  --location eastus \
+  --sku Standard_LRS
+
+# Create Production Storage Account
+az storage account create \
+  --name stwebappprodeastus \
+  --resource-group rg-webapp-prod-eastus \
+  --location eastus \
+  --sku Standard_LRS
