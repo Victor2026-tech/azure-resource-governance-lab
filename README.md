@@ -1,48 +1,119 @@
-# Azure Resource Governance Lab
+# Azure Resource Governance Strategy
 
-## Naming Convention
+## Azure Resource Hierarchy
 
-### Subscription Naming Convention
+Microsoft Azure organizes resources in a hierarchical structure to simplify management, governance, and access control.
 
-Format:
+```text
+Azure Tenant
+│
+└── Azure Subscription (Free Trial)
+    │
+    ├── Resource Group: rg-webapp-dev-eastus
+    │     └── Storage Account: stwebappdeveastus
+    │
+    ├── Resource Group: rg-webapp-prod-eastus
+    │     └── Storage Account: stwebappprodeastus
+    │
+    └── Resource Group: rg-temp-dev-eastus
+          └── Storage Account: sttempdeveastus
+```
 
-sub-<environment>-<organization>
+### Hierarchy Explanation
 
-Examples:
+* **Tenant** – The highest level of Azure identity management that contains users, groups, and subscriptions.
+* **Subscription** – A billing and management boundary used to organize Azure resources.
+* **Resource Group** – A logical container that groups resources sharing the same lifecycle or purpose.
+* **Resources** – Individual Azure services such as Storage Accounts, Virtual Machines, and SQL Databases.
 
-* sub-dev-vcm
-* sub-prod-vcm
+---
 
-Note: The Azure Free Trial subscription provided by Microsoft was used for implementation. The naming convention above represents the organization's proposed standard for future subscriptions.
+# Resource Group Strategy
 
-### Resource Group Naming Convention
+The project separates resources according to environment.
 
-Format:
+| Resource Group        | Purpose                                                                    |
+| --------------------- | -------------------------------------------------------------------------- |
+| rg-webapp-dev-eastus  | Development environment used for testing and experimentation.              |
+| rg-webapp-prod-eastus | Production environment used for live workloads.                            |
+| rg-temp-dev-eastus    | Temporary environment used to test lifecycle management and bulk deletion. |
 
-rg-<application>-<environment>-<region>
+### Why this strategy?
 
-Examples:
+Separating environments provides several advantages:
 
-* rg-webapp-dev-eastus
-* rg-webapp-prod-eastus
-* rg-temp-dev-eastus
+* Prevents development activities from affecting production systems.
+* Makes it easier to assign different permissions to development and production teams.
+* Simplifies resource cleanup by deleting an entire Resource Group when it is no longer needed.
+* Supports future scalability by allowing additional environments (Test, QA, Staging) to be created using the same naming standard.
 
-### Virtual Machine Naming Convention
+---
 
-Format:
+# Tagging Strategy
 
-vm-<application>-<environment>-<number>
+The following tags were applied to Azure Resource Groups and resources.
 
-Example:
+| Tag         | Example Value            | Purpose                                          |
+| ----------- | ------------------------ | ------------------------------------------------ |
+| environment | development / production | Identifies deployment environment.               |
+| owner       | TeamA / TeamB            | Identifies the responsible team.                 |
+| project     | AzureLab                 | Groups all resources belonging to this project.  |
+| lifecycle   | temporary                | Identifies resources that can safely be deleted. |
+| costCenter  | IT001                    | Supports cost allocation and budgeting.          |
 
-* vm-webapp-dev-01
+### Benefits of Tagging
 
-### Storage Account Naming Convention
+* Improves cost tracking.
+* Enables automation through Azure scripts and policies.
+* Simplifies resource searching and filtering.
+* Helps identify ownership of resources.
 
-Format:
+---
 
-st<application><environment><region>
+# Governance Strategy
 
-Example:
+## Role-Based Access Control (RBAC)
 
-* stwebappdeveastus
+The following RBAC model was designed for this project.
+
+| Team            | Resource Group        | Role        |
+| --------------- | --------------------- | ----------- |
+| TeamA           | rg-webapp-prod-eastus | Contributor |
+| TeamB           | rg-webapp-dev-eastus  | Contributor |
+| Operations Team | All Resource Groups   | Reader      |
+
+### RBAC Rationale
+
+* TeamA manages production resources.
+* TeamB develops and tests applications in the development environment.
+* Operations personnel require read-only access for monitoring and auditing.
+
+Because this project was completed using a single Azure Free Trial account, the RBAC assignments were documented as a simulated enterprise environment.
+
+---
+
+# Azure Policy
+
+In a production environment, Azure Policy would be used to:
+
+* Enforce approved naming conventions.
+* Require mandatory tags such as Environment and Owner.
+* Prevent deployment into unauthorized regions.
+* Restrict the creation of unsupported resource types.
+
+---
+
+# Lifecycle Management
+
+The Resource Group **rg-temp-dev-eastus** was created specifically to test Azure lifecycle management.
+
+A Storage Account was deployed into the Resource Group and later deleted by deleting the Resource Group itself.
+
+This demonstrates Azure's ability to perform bulk deletion, where all resources within a Resource Group are automatically removed.
+
+---
+
+# Conclusion
+
+This project demonstrates Azure governance principles through consistent naming conventions, environment-based resource organization, tagging, RBAC planning, lifecycle management, and governance best practices.
+
